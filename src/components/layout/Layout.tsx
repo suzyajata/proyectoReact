@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks';
 import {
   Person as PersonIcon,
   Assignment as TaskIcon,
+  People as PeopleIcon,
 } from '@mui/icons-material';
 import { Header } from './Header';
 import type { MenuType } from './types';
@@ -23,11 +24,18 @@ export const Layout = ({ children }: Props) => {
   const menuOptions: MenuType[] = [
     { text: 'Mi Perfil', icon: <PersonIcon />, path: '/perfil' },
     { text: 'Mis Tareas', icon: <TaskIcon />, path: '/tasks' },
-    { text: 'Mis Usuarios', icon: <TaskIcon />, path: '/users' },
+    { text: 'Usuarios', icon: <PeopleIcon />, path: '/users' }, // Corregido el icono y texto
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box 
+      sx={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column',
+        background: '#e4e7e1',
+      }}
+    >
       {/* Barra superior */}
       <Header
         username={user?.username}
@@ -48,7 +56,7 @@ export const Layout = ({ children }: Props) => {
       </Box>
 
       {/* Footer */}
-      <Footer message="© 2025 Mi App" />
+      <Footer message="© 2025 Gestión de Tareas y Usuarios - Diplomado React" />
     </Box>
   );
 };

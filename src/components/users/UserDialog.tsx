@@ -6,15 +6,18 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
+  InputAdornment,
   TextField,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import type { UserType } from './type';
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import type { ActionState } from '../../interfaces';
-import type { UserFormValues1 } from '../../models';
+import type { UserFormValues } from '../../models';
 import { createInitialState } from '../../helpers';
 
-export type UserActionState = ActionState<UserFormValues1>;
+export type UserActionState = ActionState<UserFormValues>;
 
 interface Props {
   open: boolean;
@@ -25,24 +28,45 @@ interface Props {
     formData: FormData
   ) => Promise<UserActionState | undefined>;
 }
+
 export const UserDialog = ({ onClose, open, user, handleCreateEdit }: Props) => {
-  const initialState = createInitialState<UserFormValues1>();
+  const initialState = createInitialState<UserFormValues>();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [state, submitAction, isPending] = useActionState(
     handleCreateEdit,
     initialState
   );
 
+  const handleTogglePassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const handleToggleConfirmPassword = () => {
+    setShowConfirmPassword((prev) => !prev);
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth={'sm'} fullWidth>
-      <DialogTitle>{user ? 'Editar usuario' : 'Nueva usuario'}</DialogTitle>
+      <DialogTitle 
+        sx={{ 
+          bgcolor: '#FE5668', 
+          color: 'white',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          py: 3,
+        }}
+      >
+        {user ? 'Editar Usuario' : 'Nuevo Usuario'}
+      </DialogTitle>
       <Box key={user?.id ?? 'new'} component={'form'} action={submitAction}>
-        <DialogContent>
+        <DialogContent sx={{ mt: 2, bgcolor: '#FEC1A5', py: 3 }}>
           <TextField
             name="username"
             autoFocus
             margin="dense"
-            label="Nombre de usuario"
+            label="Nombre de Usuario"
             fullWidth
             required
             variant="outlined"
@@ -50,47 +74,150 @@ export const UserDialog = ({ onClose, open, user, handleCreateEdit }: Props) => 
             defaultValue={state?.formData?.username || user?.username || ''}
             error={!!state?.errors?.username}
             helperText={state?.errors?.username}
-            sx={{ mb: 2 }}
+            sx={{ 
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused fieldset': {
+                  borderColor: '#FE5668',
+                  borderWidth: 2,
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#FE5668',
+                fontWeight: 600,
+              },
+            }}
           />
+          
           <TextField
             name="password"
-            autoFocus
             margin="dense"
-            label="Pssword"
+            label="Contraseña"
             fullWidth
             required
             variant="outlined"
+            type={showPassword ? 'text' : 'password'}
             disabled={isPending}
-            defaultValue={state?.formData?.password || user?.password|| ''}
+            defaultValue={state?.formData?.password || ''}
             error={!!state?.errors?.password}
             helperText={state?.errors?.password}
-            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleTogglePassword}
+                    edge="end"
+                    disabled={isPending}
+                    sx={{ color: '#FE5668' }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{ 
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+                borderRadius: 2,
+                '&.Mui-focused fieldset': {
+                  borderColor: '#FE5668',
+                  borderWidth: 2,
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#FE5668',
+                fontWeight: 600,
+              },
+            }}
           />
-          <TextField
-            name="confirmPassword"
-            autoFocus
-            margin="dense"
-            label="Pssword"
-            fullWidth
-            required
-            variant="outlined"
-            disabled={isPending}
-            defaultValue={state?.formData?.confirmPassword || user?.confirmPassword|| ''}
-            error={!!state?.errors?.confirmPassword}
-            helperText={state?.errors?.confirmPassword}
-            sx={{ mb: 2 }}
-          />
+
+          {!user && (
+            <TextField
+              name="confirmPassword"
+              margin="dense"
+              label="Confirmar Contraseña"
+              fullWidth
+              required
+              variant="outlined"
+              type={showConfirmPassword ? 'text' : 'password'}
+              disabled={isPending}
+              defaultValue={state?.formData?.confirmPassword || ''}
+              error={!!state?.errors?.confirmPassword}
+              helperText={state?.errors?.confirmPassword}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleToggleConfirmPassword}
+                      edge="end"
+                      disabled={isPending}
+                      sx={{ color: '#FE5668' }}
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ 
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'white',
+                  borderRadius: 2,
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#FE5668',
+                    borderWidth: 2,
+                  },
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#FE5668',
+                  fontWeight: 600,
+                },
+              }}
+            />
+          )}
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={onClose} color="inherit" disabled={isPending}>
+        <DialogActions sx={{ p: 3, bgcolor: '#FF8D8F', gap: 2 }}>
+          <Button 
+            onClick={onClose} 
+            disabled={isPending}
+            sx={{
+              borderRadius: 3,
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              border: '2px solid white',
+              color: '#FE5668',
+              bgcolor: 'white',
+              '&:hover': {
+                bgcolor: '#FEC1A5',
+                border: '2px solid #FE5668',
+              },
+            }}
+          >
             Cancelar
           </Button>
           <Button
             type="submit"
             variant="contained"
-            color="primary"
             disabled={isPending}
-            startIcon={isPending ? <CircularProgress /> : null}
+            startIcon={isPending ? <CircularProgress size={16} /> : null}
+            sx={{
+              bgcolor: '#e4e7e1',
+              borderRadius: 3,
+              fontWeight: 600,
+              px: 4,
+              py: 1,
+              boxShadow: 'e4e7e1',
+              '&:hover': {
+                bgcolor: '#B9D394',
+                transform: 'translateY(-1px)',
+                boxShadow: '#e4e7e1',
+              },
+              transition: 'all 0.2s ease-in-out',
+            }}
           >
             {user ? 'Actualizar' : 'Crear'}
           </Button>
